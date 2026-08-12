@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>电商推广盈亏计算器（双模版）</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        input:focus { outline: none; }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen p-3 md:p-6 flex justify-center items-start">
+
+    <div class="w-full max-w-4xl space-y-4">
+        
+        <!-- 顶部标题与模式切换栏 -->
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col md:flex-row justify-between items-center gap-3">
+            <div>
+                <h1 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <span>📊</span> 电商推广盈亏计算器
+                </h1>
+                <p class="text-xs text-slate-400 mt-0.5">支持大盘实际复盘与单品理论测算双模式</p>
+            </div>
+            
+            <!-- 模块切换开关按钮 -->
+            <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
+                <button id="btnModuleA" onclick="switchModule('A')" class="px-4 py-1.5 text-xs font-bold rounded-lg transition bg-white text-indigo-600 shadow-sm">
+                    📈 模块一：大盘数据复盘
+                </button>
+                <button id="btnModuleB" onclick="switchModule('B')" class="px-4 py-1.5 text-xs font-bold rounded-lg transition text-slate-500 hover:text-slate-800">
+                    📦 模块二：单品标价测算
+                </button>
+            </div>
+        </div>
+
+        <!-- 主体网格布局 -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
+            
+            <!-- 左侧：动态表单输入区域 -->
+            <div class="md:col-span-7 space-y-4">
+
+                <!-- 公共固定项配置 -->
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 space-y-3">
+                    <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider">⚙️ 固定项配置</h2>
+                    <div class="grid grid-cols-4 gap-2">
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">平台扣点 (%)</label>
+                            <input type="number" id="commonDeduction" value="0.6" step="0.1" inputmode="decimal" class="calc-input w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:border-indigo-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">单件运费 (元)</label>
+                            <input type="number" id="commonShippingFee" value="2" step="0.1" inputmode="decimal" class="calc-input w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:bg-white focus:border-indigo-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">运费险 (元/单)</label>
+                            <input type="number" id="commonInsurance" value="0.1" step="0.01" inputmode="decimal" class="calc-input w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:border-indigo-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">默认退货率(%)</label>
+                            <input type="number" id="commonRefundRate" value="10" step="0.1" inputmode="decimal" class="calc-input w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-rose-500 focus:bg-white focus:border-indigo-500 transition">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= 模块一输入区 (大盘复盘) ================= -->
+                <div id="panelModuleA" class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 space-y-3">
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <h2 class="text-xs font-bold text-indigo-600 uppercase tracking-wider">📈 模块一：大盘数据输入 (对齐后台)</h2>
+                        <span class="text-[10px] bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded">清空直接填</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">后台总交易额 (GMV ￥)</label>
+                            <input type="number" id="aGmv" value="" placeholder="请输入总交易额" inputmode="decimal" class="calc-input w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:bg-white focus:border-indigo-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">后台总广告费 (￥)</label>
+                            <input type="number" id="aAdSpend" value="" placeholder="请输入总广告费" inputmode="decimal" class="calc-input w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-rose-500 focus:bg-white focus:border-indigo-500 transition">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-3 pt-1">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">货物成本 (元/件)</label>
+                            <input type="number" id="aGoodsCost" value="" placeholder="货物成本" inputmode="decimal" class="calc-input w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:bg-white focus:border-indigo-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">总订单量 (单)</label>
+                            <input type="number" id="aOrders" value="" placeholder="总订单量" inputmode="numeric" class="calc-input w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:bg-white focus:border-indigo-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">净成交笔数 (单)</label>
+                            <input type="number" id="aValidOrders" value="" placeholder="净成交笔数" inputmode="numeric" class="calc-input w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-emerald-600 focus:bg-white focus:border-indigo-500 transition">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= 模块二输入区 (单品标价测算) ================= -->
+                <div id="panelModuleB" class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 space-y-3 hidden">
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <h2 class="text-xs font-bold text-emerald-600 uppercase tracking-wider">📦 模块二：单品标准测算输入</h2>
+                        <span class="text-[10px] bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded">上新前预估</span>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">商品售价 (元)</label>
+                            <input type="number" id="bPrice" value="" placeholder="售价" inputmode="decimal" class="calc-input w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:bg-white focus:border-indigo-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">货物成本 (元)</label>
+                            <input type="number" id="bGoodsCost" value="" placeholder="货物成本" inputmode="decimal" class="calc-input w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:bg-white focus:border-indigo-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">实际投产 (ROI)</label>
+                            <input type="number" id="bRoi" value="" placeholder="目标ROI" step="0.01" inputmode="decimal" class="calc-input w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-indigo-600 focus:bg-white focus:border-indigo-500 transition">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 pt-1">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">预估订单量 (单)</label>
+                            <input type="number" id="bOrders" value="" placeholder="订单量" inputmode="numeric" class="calc-input w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:bg-white focus:border-indigo-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">自定义退货率 (%)</label>
+                            <input type="number" id="bRefundRate" value="" placeholder="留空则用上方默认" step="0.1" inputmode="decimal" class="calc-input w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-rose-500 focus:bg-white focus:border-indigo-500 transition">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 右侧：核算面板 Dashboard -->
+            <div class="md:col-span-5 flex flex-col justify-between">
+                <div class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white p-5 rounded-2xl shadow-xl border border-slate-800 space-y-5 sticky top-6">
+                    
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <span id="panelTitle" class="text-xs font-medium text-slate-400">核算面板 (大盘复盘模式)</span>
+                        <span id="profitStatusBadge" class="text-xs px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-medium">等待输入</span>
+                    </div>
+
+                    <!-- 保本 ROI / 实际投产对比卡片 -->
+                    <div class="bg-slate-800/50 p-3.5 rounded-xl border border-slate-700/50 grid grid-cols-2 gap-2 text-center">
+                        <div class="border-r border-slate-700/60 pr-2">
+                            <p class="text-[11px] text-slate-400">保本 ROI</p>
+                            <p class="text-2xl font-black text-amber-400 mt-0.5" id="resBreakevenRoi">0.00</p>
+                        </div>
+                        <div>
+                            <p class="text-[11px] text-slate-400">实际投产 (ROI)</p>
+                            <p class="text-2xl font-black text-indigo-300 mt-0.5" id="resActualRoi">0.00</p>
+                        </div>
+                    </div>
+
+                    <!-- 核心指标网格 -->
+                    <div class="grid grid-cols-2 gap-2.5 text-sm">
+                        <div class="bg-slate-800/35 p-2.5 rounded-lg border border-slate-800">
+                            <p class="text-[11px] text-slate-400">总交易额 (GMV)</p>
+                            <p class="text-sm font-bold text-slate-200 mt-0.5" id="resGmv">￥0.00</p>
+                        </div>
+                        <div class="bg-slate-800/35 p-2.5 rounded-lg border border-slate-800">
+                            <p class="text-[11px] text-slate-400">成交广告花费</p>
+                            <p class="text-sm font-bold text-rose-300 mt-0.5" id="resAdSpend">￥0.00</p>
+                        </div>
+                        <div class="bg-slate-800/35 p-2.5 rounded-lg border border-slate-800">
+                            <p class="text-[11px] text-slate-400">每笔订单推广费</p>
+                            <p class="text-sm font-bold text-amber-300 mt-0.5" id="resAdPerOrder">￥0.00</p>
+                        </div>
+                        <div class="bg-slate-800/35 p-2.5 rounded-lg border border-slate-800">
+                            <p class="text-[11px] text-slate-400">单件毛利率</p>
+                            <p class="text-sm font-bold text-emerald-400 mt-0.5" id="resMarginRate">0.0%</p>
+                        </div>
+                        <div class="bg-slate-800/35 p-2.5 rounded-lg border border-slate-800">
+                            <p class="text-[11px] text-slate-400">单件毛利润</p>
+                            <p class="text-sm font-bold text-slate-200 mt-0.5" id="resGrossProfit">￥0.00</p>
+                        </div>
+                        <div class="bg-slate-800/35 p-2.5 rounded-lg border border-slate-800">
+                            <p class="text-[11px] text-slate-400">单件实际净利润</p>
+                            <p class="text-sm font-bold text-indigo-300 mt-0.5" id="resNetPerUnit">￥0.00</p>
+                        </div>
+                    </div>
+
+                    <!-- 最终净利润显示 -->
+                    <div class="pt-2 border-t border-slate-800">
+                        <p class="text-xs text-slate-400">预估最终净利润</p>
+                        <p class="text-4xl font-extrabold tracking-tight mt-1" id="resNetProfit">￥0.00</p>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        let currentModule = 'A';
+
+        function switchModule(moduleName) {
+            currentModule = moduleName;
+            const btnA = document.getElementById('btnModuleA');
+            const btnB = document.getElementById('btnModuleB');
+            const panelA = document.getElementById('panelModuleA');
+            const panelB = document.getElementById('panelModuleB');
+            const panelTitle = document.getElementById('panelTitle');
+
+            if (moduleName === 'A') {
+                btnA.className = "px-4 py-1.5 text-xs font-bold rounded-lg transition bg-white text-indigo-600 shadow-sm";
+                btnB.className = "px-4 py-1.5 text-xs font-bold rounded-lg transition text-slate-500 hover:text-slate-800";
+                panelA.classList.remove('hidden');
+                panelB.classList.add('hidden');
+                panelTitle.innerText = "核算面板 (大盘复盘模式)";
+            } else {
+                btnB.className = "px-4 py-1.5 text-xs font-bold rounded-lg transition bg-white text-emerald-600 shadow-sm";
+                btnA.className = "px-4 py-1.5 text-xs font-bold rounded-lg transition text-slate-500 hover:text-slate-800";
+                panelB.classList.remove('hidden');
+                panelA.classList.add('hidden');
+                panelTitle.innerText = "核算面板 (单品测算模式)";
+            }
+            calculate();
+        }
+
+        function getVal(id) {
+            return parseFloat(document.getElementById(id).value) || 0;
+        }
+
+        function calculate() {
+            // 固定项配置
+            const deductionRate = getVal('commonDeduction') / 100;
+            const shippingFee = getVal('commonShippingFee');
+            const shippingInsurance = getVal('commonInsurance');
+            const defaultRefundRate = getVal('commonRefundRate') / 100;
+
+            let gmv = 0, adSpend = 0, orders = 0, validOrders = 0, actualRoi = 0, goodsCost = 0;
+
+            if (currentModule === 'A') {
+                gmv = getVal('aGmv');
+                adSpend = getVal('aAdSpend');
+                goodsCost = getVal('aGoodsCost');
+                orders = getVal('aOrders');
+                validOrders = getVal('aValidOrders');
+                actualRoi = adSpend > 0 ? gmv / adSpend : 0;
+            } else {
+                const price = getVal('bPrice');
+                goodsCost = getVal('bGoodsCost');
+                actualRoi = getVal('bRoi');
+                orders = getVal('bOrders');
+                
+                // 如果单品测算中填了自定义退货率就用填的，没填就用固定项默认的
+                const customRefundInput = document.getElementById('bRefundRate').value;
+                const refundRate = customRefundInput !== '' ? parseFloat(customRefundInput) / 100 : defaultRefundRate;
+
+                validOrders = Math.round(orders * (1 - refundRate));
+                gmv = orders * price;
+                adSpend = actualRoi > 0 ? gmv / actualRoi : 0;
+            }
+
+            const totalUnitCost = goodsCost + shippingFee;
+            const avgPrice = orders > 0 ? gmv / orders : 0;
+            const grossProfit = avgPrice - totalUnitCost;
+            const marginRate = avgPrice > 0 ? (grossProfit / avgPrice) * 100 : 0;
+
+            const netPerUnitForRoi = grossProfit - (avgPrice * deductionRate) - shippingInsurance;
+            let breakevenRoi = 0;
+            if (netPerUnitForRoi > 0) {
+                breakevenRoi = avgPrice / netPerUnitForRoi;
+                document.getElementById('resBreakevenRoi').innerText = breakevenRoi.toFixed(2);
+            } else {
+                document.getElementById('resBreakevenRoi').innerText = '无法保本';
+            }
+
+            const adPerOrder = orders > 0 ? adSpend / orders : 0;
+            const totalDeduction = gmv * deductionRate;
+            const totalInsurance = orders * shippingInsurance;
+            const netProfit = (validOrders * grossProfit) - adSpend - totalDeduction - totalInsurance;
+            const netPerUnit = validOrders > 0 ? netProfit / validOrders : 0;
+
+            document.getElementById('resActualRoi').innerText = actualRoi.toFixed(2);
+            document.getElementById('resGmv').innerText = `￥${gmv.toFixed(2)}`;
+            document.getElementById('resAdSpend').innerText = `￥${adSpend.toFixed(2)}`;
+            document.getElementById('resAdPerOrder').innerText = `￥${adPerOrder.toFixed(2)}`;
+            document.getElementById('resMarginRate').innerText = `${marginRate.toFixed(1)}%`;
+            document.getElementById('resGrossProfit').innerText = `￥${grossProfit.toFixed(2)}`;
+            document.getElementById('resNetPerUnit').innerText = `￥${netPerUnit.toFixed(2)}`;
+
+            const netProfitEl = document.getElementById('resNetProfit');
+            const badgeEl = document.getElementById('profitStatusBadge');
+            netProfitEl.innerText = `￥${netProfit.toFixed(2)}`;
+
+            if (gmv === 0 && adSpend === 0 && orders === 0) {
+                badgeEl.className = 'text-xs px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-medium';
+                badgeEl.innerText = '等待输入';
+            } else if (netProfit > 0) {
+                netProfitEl.className = 'text-4xl font-extrabold tracking-tight mt-1 text-emerald-400';
+                badgeEl.className = 'text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-medium border border-emerald-500/30';
+                badgeEl.innerText = '盈利状态';
+            } else if (netProfit < 0) {
+                netProfitEl.className = 'text-4xl font-extrabold tracking-tight mt-1 text-rose-400';
+                badgeEl.className = 'text-xs px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-medium border border-rose-500/30';
+                badgeEl.innerText = '亏损状态';
+            } else {
+                netProfitEl.className = 'text-4xl font-extrabold tracking-tight mt-1 text-white';
+                badgeEl.className = 'text-xs px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-medium';
+                badgeEl.innerText = '收支平衡';
+            }
+        }
+
+        document.querySelectorAll('input').forEach(input => {
+            ['input', 'change', 'keyup', 'blur'].forEach(evt => {
+                input.addEventListener(evt, calculate);
+            });
+        });
+
+        calculate();
+    </script>
+</body>
+</html>
