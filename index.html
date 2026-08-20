@@ -23,7 +23,7 @@
                 <h1 class="text-lg font-bold text-slate-800 flex items-center gap-2">
                     <span>📊</span> 电商推广盈亏计算器
                 </h1>
-                <p class="text-xs text-slate-400 mt-0.5">支持大盘实际复盘与单品理论测算双模式</p>
+                <p class="text-xs text-slate-400 mt-0.5">支持大盘实际复盘与单品理论测算双模式 (已对齐EXCEL表算法)</p>
             </div>
             
             <!-- 模块切换开关按钮 -->
@@ -172,7 +172,7 @@
                             <p class="text-sm font-bold text-emerald-400 mt-0.5" id="resMarginRate">0.0%</p>
                         </div>
                         <div class="bg-slate-800/35 p-2.5 rounded-lg border border-slate-800">
-                            <p class="text-[11px] text-slate-400">单件毛利润</p>
+                            <p class="text-[11px] text-slate-400">单件利润 (售价-成本)</p>
                             <p class="text-sm font-bold text-slate-200 mt-0.5" id="resGrossProfit">￥0.00</p>
                         </div>
                         <div class="bg-slate-800/35 p-2.5 rounded-lg border border-slate-800">
@@ -232,61 +232,84 @@
             const shippingInsurance = getVal('commonInsurance');
             const defaultRefundRate = getVal('commonRefundRate') / 100;
 
-            let gmv = 0, adSpend = 0, validOrders = 0, actualRoi = 0, goodsCost = 0;
+            let gmv = 0, adSpend = 0, actualRoi = 0, goodsCost = 0;
+            let J = 0, I = 0, V = 0, A = 0, B = 0, refundRate = 0;
 
             if (currentModule === 'A') {
                 gmv = getVal('aGmv');
                 adSpend = getVal('aAdSpend');
                 goodsCost = getVal('aGoodsCost');
-                validOrders = getVal('aValidOrders');
+                V = getVal('aValidOrders'); // 净成交笔数
+                
+                refundRate = defaultRefundRate;
+                // 逆向推导总订单量(J)
+                J = refundRate >= 1 ? V : Math.round(V / (1 - refundRate));
+                I = J - V; // 退款单量
+                
+                A = J > 0 ? gmv / J : 0; // 逆向推导单件售价
                 actualRoi = adSpend > 0 ? gmv / adSpend : 0;
             } else {
-                const price = getVal('bPrice');
+                A = getVal('bPrice');
                 goodsCost = getVal('bGoodsCost');
                 actualRoi = getVal('bRoi');
-                const bOrders = getVal('bOrders');
+                J = getVal('bOrders');
                 
                 const customRefundInput = document.getElementById('bRefundRate').value;
-                const refundRate = customRefundInput !== '' ? parseFloat(customRefundInput) / 100 : defaultRefundRate;
-
-                validOrders = Math.round(bOrders * (1 - refundRate));
-                gmv = bOrders * price;
-                adSpend = actualRoi > 0 ? gmv / actualRoi : 0;
+                refundRate = customRefundInput !== '' ? parseFloat(customRefundInput) / 100 : defaultRefundRate;
+                
+                I = Math.round(J * refundRate); // 退款单数
+                V = J - I; // 净成交笔数
+                
+                gmv = J * A; // 总交易额
+                adSpend = actualRoi > 0 ? gmv / actualRoi : 0; // 成交广告花费
             }
 
-            const totalUnitCost = goodsCost + shippingFee;
-            const avgPrice = validOrders > 0 ? gmv / validOrders : 0;
-            const grossProfit = avgPrice - totalUnitCost;
-            const marginRate = avgPrice > 0 ? (grossProfit / avgPrice) * 100 : 0;
+            B = goodsCost + shippingFee;
+            const C = A - B; // 单件利润 (售价 - 成本)
 
-            const netPerUnitForRoi = grossProfit - (avgPrice * deductionRate) - shippingInsurance;
-            let breakevenRoi = 0;
-            if (netPerUnitForRoi > 0) {
-                breakevenRoi = avgPrice / netPerUnitForRoi;
+            // Excel: 每笔订单成交花费
+            const H = J > 0 ? adSpend / J : 0; 
+            
+            // Excel: 单均毛盈利
+            const G = C - H; 
+
+            // Excel: 理论持平投产 = 售价 / 利润
+            let breakevenRoi = C > 0 ? (A / C) : 0;
+
+            // Excel: 总毛利润 = 订单量 * 毛盈利
+            const K = J * G;
+
+            // Excel: 平台扣点和运费险均按(总订单量/总GMV)产生
+            const totalDeduction = gmv * deductionRate;
+            const totalInsurance = J * shippingInsurance;
+
+            // Excel: 净利润 = 利润总额 - 退款折损(退款单*单件利润) - 平台扣点 - 运费险
+            const netProfit = K - (I * C) - totalDeduction - totalInsurance;
+
+            // 补充展示指标
+            const marginRate = A > 0 ? (C / A) * 100 : 0;
+            const netPerUnit = V > 0 ? netProfit / V : 0;
+
+            // 渲染到页面
+            if (breakevenRoi > 0) {
                 document.getElementById('resBreakevenRoi').innerText = breakevenRoi.toFixed(2);
             } else {
                 document.getElementById('resBreakevenRoi').innerText = '无法保本';
             }
 
-            const adPerOrder = validOrders > 0 ? adSpend / validOrders : 0;
-            const totalDeduction = gmv * deductionRate;
-            const totalInsurance = validOrders * shippingInsurance;
-            const netProfit = (validOrders * grossProfit) - adSpend - totalDeduction - totalInsurance;
-            const netPerUnit = validOrders > 0 ? netProfit / validOrders : 0;
-
             document.getElementById('resActualRoi').innerText = actualRoi.toFixed(2);
             document.getElementById('resGmv').innerText = `￥${gmv.toFixed(2)}`;
             document.getElementById('resAdSpend').innerText = `￥${adSpend.toFixed(2)}`;
-            document.getElementById('resAdPerOrder').innerText = `￥${adPerOrder.toFixed(2)}`;
+            document.getElementById('resAdPerOrder').innerText = `￥${H.toFixed(2)}`;
             document.getElementById('resMarginRate').innerText = `${marginRate.toFixed(1)}%`;
-            document.getElementById('resGrossProfit').innerText = `￥${grossProfit.toFixed(2)}`;
+            document.getElementById('resGrossProfit').innerText = `￥${C.toFixed(2)}`;
             document.getElementById('resNetPerUnit').innerText = `￥${netPerUnit.toFixed(2)}`;
 
             const netProfitEl = document.getElementById('resNetProfit');
             const badgeEl = document.getElementById('profitStatusBadge');
             netProfitEl.innerText = `￥${netProfit.toFixed(2)}`;
 
-            if (gmv === 0 && adSpend === 0 && validOrders === 0) {
+            if (gmv === 0 && adSpend === 0 && V === 0 && J === 0) {
                 badgeEl.className = 'text-xs px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-medium';
                 badgeEl.innerText = '等待输入';
             } else if (netProfit > 0) {
