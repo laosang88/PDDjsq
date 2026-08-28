@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>电商推广盈亏计算器（双模精算版）</title>
+    <title>电商推广盈亏计算器（极简精算版）</title>
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -34,10 +34,10 @@
                 <h1 class="text-lg font-bold text-slate-800 flex items-center gap-2">
                     <span>📊</span> 电商推广盈亏计算器
                 </h1>
-                <p class="text-xs text-slate-400 mt-0.5">支持大盘实际复盘与单品理论测算双模式 (全损联动保本)</p>
+                <p class="text-xs text-slate-400 mt-0.5">大盘净值复盘 + 单品纯净精测 (对齐促进净成交规则)</p>
             </div>
             
-            <!-- 模块切换开关按钮 -->
+            <!-- 模块切换按钮 -->
             <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
                 <button id="btnModuleA" onclick="switchModule('A')" class="px-4 py-1.5 text-xs font-bold rounded-lg transition text-slate-500 hover:text-slate-800">
                     📈 模块一：大盘数据复盘
@@ -51,12 +51,12 @@
         <!-- 主体网格布局 -->
         <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
             
-            <!-- 左侧：动态表单输入区域 -->
+            <!-- 左侧：表单输入区 -->
             <div class="md:col-span-7 space-y-4">
 
                 <!-- 公共固定项配置 -->
                 <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 space-y-3">
-                    <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider">⚙️ 固定项配置</h2>
+                    <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider">⚙️ 基础费率配置</h2>
                     <div class="grid grid-cols-3 gap-3">
                         <div>
                             <label class="block text-[11px] font-semibold text-slate-600 mb-1">平台扣点 (%)</label>
@@ -73,7 +73,7 @@
                     </div>
                 </div>
 
-                <!-- ================= 模块一输入区 (大盘复盘 - 后台净指标对齐) ================= -->
+                <!-- ================= 模块一输入区 (大盘后台净值复盘) ================= -->
                 <div id="panelModuleA" class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 space-y-3 hidden">
                     <div class="flex justify-between items-center border-b pb-2">
                         <h2 class="text-xs font-bold text-indigo-600 uppercase tracking-wider">📈 模块一：后台大盘净值复盘</h2>
@@ -103,59 +103,41 @@
                     </div>
                 </div>
 
-                <!-- ================= 模块二输入区 (单品标价分层精算) ================= -->
-                <div id="panelModuleB" class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 space-y-3.5">
+                <!-- ================= 模块二输入区 (单品纯净精测) ================= -->
+                <div id="panelModuleB" class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 space-y-4">
                     <div class="flex justify-between items-center border-b pb-2">
-                        <h2 class="text-xs font-bold text-indigo-600 uppercase tracking-wider">📦 模块二：单品标价测算 (损耗开关版)</h2>
-                        <span class="text-[10px] bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded">上新前精细化测算</span>
+                        <h2 class="text-xs font-bold text-indigo-600 uppercase tracking-wider">📦 模块二：单品标价测算 (精简版)</h2>
+                        <span class="text-[10px] bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded">未发货秒退已由平台直接豁免</span>
                     </div>
 
                     <div class="grid grid-cols-4 gap-2">
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-1">商品售价 (元)</label>
-                            <input type="number" id="bPrice" value="10" placeholder="售价" inputmode="decimal" class="calc-input w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:bg-white focus:border-indigo-500 transition">
+                            <input type="number" id="bPrice" value="10.4" placeholder="售价" inputmode="decimal" class="calc-input w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:bg-white focus:border-indigo-500 transition">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-1">货物成本 (元)</label>
-                            <input type="number" id="bGoodsCost" value="6" placeholder="成本" inputmode="decimal" class="calc-input w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:bg-white focus:border-indigo-500 transition">
+                            <input type="number" id="bGoodsCost" value="5.9" placeholder="成本" inputmode="decimal" class="calc-input w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:bg-white focus:border-indigo-500 transition">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-1">实际投产 (ROI)</label>
-                            <input type="number" id="bRoi" value="10" placeholder="目标ROI" step="0.01" inputmode="decimal" class="calc-input w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-indigo-600 focus:bg-white focus:border-indigo-500 transition">
+                            <input type="number" id="bRoi" value="9" placeholder="目标ROI" step="0.01" inputmode="decimal" class="calc-input w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-indigo-600 focus:bg-white focus:border-indigo-500 transition">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-1">预估订单量 (单)</label>
-                            <input type="number" id="bOrders" value="100" placeholder="订单量" inputmode="numeric" class="calc-input w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:bg-white focus:border-indigo-500 transition">
+                            <input type="number" id="bOrders" value="300" placeholder="订单量" inputmode="numeric" class="calc-input w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:bg-white focus:border-indigo-500 transition">
                         </div>
                     </div>
 
-                    <!-- 1️⃣ 发货前退款 / 取消 -->
-                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/70 space-y-2">
-                        <div class="flex justify-between items-center">
-                            <span class="text-xs font-bold text-slate-700">1️⃣ 发货前退款 / 取消 (无物流损失)</span>
-                            <span class="text-[10px] text-slate-400">广告费部分沉没</span>
-                        </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-[11px] text-slate-500 mb-1">发货前退款率 (%)</label>
-                                <input type="number" id="bPreRefundRate" value="10" step="0.1" class="calc-input w-full p-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-rose-500 focus:border-indigo-500 transition">
-                            </div>
-                            <div>
-                                <label class="block text-[11px] text-slate-500 mb-1">广告费退回比例 (%)</label>
-                                <input type="number" id="bAdRefundRatio" value="70" step="1" class="calc-input w-full p-2 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-700 focus:border-indigo-500 transition">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 2️⃣ 发货后售后 (A = B + C 逻辑联动) -->
-                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/70 space-y-3">
+                    <!-- 发货后真实售后损耗 (A = B + C 联动) -->
+                    <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200/70 space-y-3">
                         <div class="flex justify-between items-center">
                             <div class="flex items-center gap-2">
                                 <label class="relative inline-flex items-center cursor-pointer">
                                     <input type="checkbox" id="togglePostShip" checked class="sr-only peer" onchange="calculate()">
                                     <div class="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
                                 </label>
-                                <span class="text-xs font-bold text-slate-700">2️⃣ 发货后售后 (产生实质物流与货损)</span>
+                                <span class="text-xs font-bold text-slate-700">发货后售后损耗 (物流费/仅退款货损)</span>
                             </div>
                             <span id="postShipStatus" class="text-[10px] text-emerald-600 font-medium">已开启核算</span>
                         </div>
@@ -176,16 +158,16 @@
                             <div class="p-2.5 bg-white rounded-lg border border-slate-200 space-y-2">
                                 <div class="flex justify-between items-center text-xs">
                                     <span class="font-medium text-slate-600">
-                                        📦 退货退款 B: <b id="textReturnRatio" class="text-indigo-600 font-bold">85%</b>
+                                        📦 退货退款 B: <b id="textReturnRatio" class="text-indigo-600 font-bold">95%</b>
                                         <span class="text-[10px] text-slate-400 font-normal">(保货损运)</span>
                                     </span>
                                     <span class="font-medium text-slate-600">
-                                        💸 仅退款 C: <b id="textDirectRatio" class="text-rose-600 font-bold">15%</b>
+                                        💸 仅退款 C: <b id="textDirectRatio" class="text-rose-600 font-bold">5%</b>
                                         <span class="text-[10px] text-slate-400 font-normal">(纯货损)</span>
                                     </span>
                                 </div>
 
-                                <input type="range" id="ratioSlider" min="0" max="100" value="85" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer slider-accent" oninput="syncFromSlider(this.value)">
+                                <input type="range" id="ratioSlider" min="0" max="100" value="95" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer slider-accent" oninput="syncFromSlider(this.value)">
 
                                 <div class="flex justify-between text-[10px] text-slate-400">
                                     <span>← 往左拖：退货多 (B增加, C减少)</span>
@@ -199,7 +181,7 @@
 
             </div>
 
-            <!-- 右侧：核算面板 Dashboard (经典 UI 风格回归) -->
+            <!-- 右侧：核算面板 Dashboard -->
             <div class="md:col-span-5 flex flex-col justify-between">
                 <div class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white p-5 rounded-2xl shadow-xl border border-slate-800 space-y-5 sticky top-6">
                     
@@ -223,7 +205,7 @@
                         </div>
                     </div>
 
-                    <!-- 核心指标网格 (经典 6 格排版) -->
+                    <!-- 核心指标网格 -->
                     <div class="grid grid-cols-2 gap-2.5 text-sm">
                         <div class="bg-slate-800/35 p-2.5 rounded-lg border border-slate-800">
                             <p class="text-[11px] text-slate-400" id="labelGmv">总交易额 (GMV)</p>
@@ -251,13 +233,13 @@
                         </div>
                     </div>
 
-                    <!-- 损耗细分 (模块二特有) -->
+                    <!-- 损耗细分展示 -->
                     <div id="lossBreakdownCard" class="bg-slate-800/30 p-2.5 rounded-lg border border-slate-800 text-[11px] text-slate-400 space-y-1">
                         <div class="text-[10px] text-slate-400 flex justify-between">
-                            <span>损耗细分 (秒退 / 退货 / 仅退)</span>
+                            <span>售后损耗细分 (退货物流损 / 仅退款纯货损)</span>
                             <span id="resFinalOrdersTag" class="text-emerald-400 font-medium">留存: 0单</span>
                         </div>
-                        <div class="text-xs text-slate-300 font-mono" id="resLossDetail">前台秒退损: ￥0.0 | 退货损: ￥0.0 | 仅退款损: ￥0.0</div>
+                        <div class="text-xs text-slate-300 font-mono" id="resLossDetail">退货运险损: ￥0.0 | 仅退款货损: ￥0.0</div>
                     </div>
 
                     <!-- 最终净利润显示 -->
@@ -274,7 +256,7 @@
     </div>
 
     <script>
-        let currentModule = 'B'; // 默认进入模块二
+        let currentModule = 'B'; // 默认进入单品测算
 
         function switchModule(moduleName) {
             currentModule = moduleName;
@@ -330,7 +312,6 @@
         }
 
         function calculate() {
-            // 固定项
             const deductionRate = getVal('commonDeduction') / 100;
             const shippingFee = getVal('commonShippingFee');
             const shippingInsurance = getVal('commonInsurance');
@@ -351,10 +332,9 @@
 
                 const avgPrice = netOrders > 0 ? (gmv / netOrders) : 0;
                 const totalUnitCost = goodsCost + shippingFee;
-                grossProfit = avgPrice - totalUnitCost; // 单件毛利润
+                grossProfit = avgPrice - totalUnitCost;
                 marginRate = avgPrice > 0 ? (grossProfit / avgPrice) * 100 : 0;
 
-                // 保本ROI
                 const netUnitGain = grossProfit - (avgPrice * deductionRate) - shippingInsurance;
                 breakevenRoi = netUnitGain > 0 ? (avgPrice / netUnitGain) : 0;
                 adPerOrder = netOrders > 0 ? (adSpend / netOrders) : 0;
@@ -365,74 +345,62 @@
                 netPerUnit = netOrders > 0 ? (netProfit / netOrders) : 0;
 
             } else {
-                // ================= 模块二：单品测算 (动态全损联动) =================
+                // ================= 模块二：单品测算 (纯净精算版) =================
                 const price = getVal('bPrice');
                 const goodsCost = getVal('bGoodsCost');
                 actualRoi = getVal('bRoi');
                 const totalOrders = getVal('bOrders');
 
-                // 1. 发货前退款
-                const preRefundRate = getVal('bPreRefundRate') / 100;
-                const adRefundRatio = getVal('bAdRefundRatio') / 100;
-                const preRefundOrders = totalOrders * preRefundRate;
-
-                // 2. 发货后售后
+                // 售后开关与滑块
                 const postShipEnabled = document.getElementById('togglePostShip').checked;
                 document.getElementById('postShipStatus').innerText = postShipEnabled ? "已开启核算" : "已关闭核算";
                 document.getElementById('postShipStatus').className = postShipEnabled ? "text-[10px] text-emerald-600 font-medium" : "text-[10px] text-slate-400 font-medium";
 
                 let postRefundRate = 0;
-                let returnGoodsRatio = 0.85;
-                let directRefundRatio = 0.15;
+                let returnGoodsRatio = 0.95;
+                let directRefundRatio = 0.05;
 
                 if (postShipEnabled) {
                     postRefundRate = getVal('bPostRefundRate') / 100;
-                    returnGoodsRatio = (parseFloat(document.getElementById('ratioSlider').value) || 85) / 100;
+                    returnGoodsRatio = (parseFloat(document.getElementById('ratioSlider').value) || 95) / 100;
                     directRefundRatio = 1 - returnGoodsRatio;
                 }
 
                 const postRefundOrders = totalOrders * postRefundRate;
-                const returnGoodsOrders = postRefundOrders * returnGoodsRatio;
-                const directRefundOrders = postRefundOrders * directRefundRatio;
-                const finalOrders = totalOrders - preRefundOrders - postRefundOrders;
+                const returnGoodsOrders = postRefundOrders * returnGoodsRatio;   // 退货退款单量
+                const directRefundOrders = postRefundOrders * directRefundRatio; // 仅退款单量
+                const finalOrders = totalOrders - postRefundOrders;              // 最终留存成交单量
 
                 document.getElementById('resFinalOrdersTag').innerText = `留存: ${finalOrders.toFixed(1)}单`;
 
                 gmv = totalOrders * price;
-                const initialAdSpend = actualRoi > 0 ? (gmv / actualRoi) : 0;
-                
-                // 广告费退回
-                const preRefundAd = actualRoi > 0 ? (preRefundOrders * price / actualRoi) : 0;
-                const adRefundAmt = preRefundAd * adRefundRatio;
-                adSpend = initialAdSpend - adRefundAmt; // 实际广告支出
+                adSpend = actualRoi > 0 ? (gmv / actualRoi) : 0;
                 adPerOrder = totalOrders > 0 ? (adSpend / totalOrders) : 0;
 
                 // 单件毛利
                 const totalBaseCost = goodsCost + shippingFee;
-                grossProfit = price - totalBaseCost; // 单件毛利润
+                grossProfit = price - totalBaseCost;
                 marginRate = price > 0 ? (grossProfit / price) * 100 : 0;
 
-                // 损耗统计
-                const lossPreAd = preRefundAd * (1 - adRefundRatio);
+                // 实质售后损耗
                 const lossReturnGoods = returnGoodsOrders * (shippingFee + shippingInsurance);
                 const lossDirectRefund = directRefundOrders * (goodsCost + shippingFee + shippingInsurance);
 
                 document.getElementById('resLossDetail').innerText = 
-                    `前台秒退损: ￥${lossPreAd.toFixed(1)} | 退货损: ￥${lossReturnGoods.toFixed(1)} | 仅退款损: ￥${lossDirectRefund.toFixed(1)}`;
+                    `退货运险损: ￥${lossReturnGoods.toFixed(1)} | 仅退款货损: ￥${lossDirectRefund.toFixed(1)}`;
 
-                // 扣除全损耗的毛利盘
+                // 扣除平台佣金与运费险后的毛利盘
                 const validOrdersNetBeforeAd = finalOrders * (price - goodsCost - shippingFee - (price * deductionRate) - shippingInsurance);
                 const baseProfitPool = validOrdersNetBeforeAd - lossReturnGoods - lossDirectRefund;
 
-                // 动态全损联动保本 ROI 逆向公式
-                const effectiveAdFactor = 1 - (preRefundRate * adRefundRatio);
+                // 纯净动态保本 ROI
                 if (baseProfitPool > 0) {
-                    breakevenRoi = (gmv * effectiveAdFactor) / baseProfitPool;
+                    breakevenRoi = gmv / baseProfitPool;
                 } else {
                     breakevenRoi = 0;
                 }
 
-                netProfit = baseProfitPool - (initialAdSpend * effectiveAdFactor);
+                netProfit = baseProfitPool - adSpend;
                 netPerUnit = finalOrders > 0 ? (netProfit / finalOrders) : 0;
             }
 
